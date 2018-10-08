@@ -32,8 +32,8 @@ namespace SyntaxHighlighter
         /// <returns>XML 化したもの</returns>
         public string Parse(string text)
         {
-            ReadHeader(text);
-            return TagReplace(text);
+            var colorTable = ReadHeader(text);
+            return TagReplace(text, colorTable);
         }
 
         #endregion
@@ -70,7 +70,7 @@ namespace SyntaxHighlighter
                     ColorToTagNameMap = ColorToTagNameXml;
                     break;
                 default:
-                    break;
+                    throw new InvalidOperationException();
             }
         }
 
@@ -98,7 +98,7 @@ namespace SyntaxHighlighter
         /// RTF のヘッダー情報を読み込む。
         /// </summary>
         /// <param name="text">RTF</param>
-        private void ReadHeader(string text)
+        private string[] ReadHeader(string text)
         {
             var m = regColortbl.Match(text);
             var items = m.Groups["items"].Value;
@@ -116,12 +116,13 @@ namespace SyntaxHighlighter
                 });
             }
 
-            colorTable_ = new string[colors.Count + 1];
+            var colorTable = new string[colors.Count + 1];
             for (int i = 0; i < colors.Count; i++)
             {
                 if (ColorToTagNameMap.ContainsKey(colors[i]))
-                    colorTable_[i + 1] = ColorToTagNameMap[colors[i]];
+                    colorTable[i + 1] = ColorToTagNameMap[colors[i]];
             }
+            return colorTable;
         }
 
         #endregion
@@ -156,14 +157,14 @@ namespace SyntaxHighlighter
         #region RTF の \cf* → XML タグ
 
         /// <summary>
-        /// RTF の \cf* の色番号をどの XML タグに変換するかの一覧。
         /// </summary>
-        string[] colorTable_;
-
-        private string GetTag(Match m)
+        /// <param name="m"></param>
+        /// <param name="colorTable">RTF の \cf* の色番号をどの XML タグに変換するかの一覧。</param>
+        /// <returns></returns>
+        private string GetTag(Match m, string[] colorTable)
         {
             var i = GetCfNumber(m);
-            var tag = colorTable_[i];
+            var tag = colorTable[i];
             return tag;
         }
 
@@ -181,7 +182,7 @@ namespace SyntaxHighlighter
         /// </summary>
         Regex regBody = new Regex(@"\\f0\s*\\fs\d*\s?(?<body>.*?)(?<=[^\\])\}", RegexOptions.Singleline | RegexOptions.Compiled);
 
-        string prevTag_ = null;
+        string? prevTag_ = null;
 
         /// <summary>
         /// &lt; &gt; &amp; にしたり、
@@ -190,7 +191,7 @@ namespace SyntaxHighlighter
         /// </summary>
         /// <param name="text">変換元</param>
         /// <returns>変換結果</returns>
-        private string TagReplace(string text)
+        private string TagReplace(string text, string[] colorTable)
         {
             text = regU.Replace(text, DecodeU);
             var body = regBody.Match(text).Groups["body"].Value;
@@ -202,7 +203,7 @@ namespace SyntaxHighlighter
             body = body.Replace(@"\{", "{");
             body = body.Replace(@"\}", "}");
 
-            body = regCf.Replace(body, InsertTag);
+            body = regCf.Replace(body, m => InsertTag(m, colorTable));
             body = regPairTag1.Replace(body, RemoveWhiteSpaceElement);
             body = regPairTag2.Replace(body, RemoveWhiteSpaceElement);
             body = regTailWhite.Replace(body, "");
@@ -278,9 +279,9 @@ namespace SyntaxHighlighter
         /// </summary>
         /// <param name="m">マッチ結果</param>
         /// <returns>変換結果</returns>
-        string InsertTag(Match m)
+        string InsertTag(Match m, string[] colorTable)
         {
-            var tag = GetTag(m);
+            var tag = GetTag(m, colorTable);
 
             string ret;
 

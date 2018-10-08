@@ -46,7 +46,7 @@ namespace SyntaxHighlighter
                     ColorToTagNameMap = ColorToTagNameXml;
                     break;
                 default:
-                    break;
+                    throw new InvalidOperationException();
             }
         }
 
