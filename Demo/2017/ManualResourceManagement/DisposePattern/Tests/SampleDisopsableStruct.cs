@@ -13,7 +13,7 @@ namespace DisposePattern.Tests
     /// </remarks>
     struct SampleDisopsableStruct : IDisposable
     {
-        private Counter _counter;
+        private Counter? _counter;
 
         public SampleDisopsableStruct(Counter counter)
         {

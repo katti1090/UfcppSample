@@ -8,7 +8,7 @@ namespace DisposePattern.Tests
     /// </summary>
     struct SampleReferenceCount : IReferenceCoutable
     {
-        private Counter _counter;
+        private Counter? _counter;
 
         public SampleReferenceCount(Counter counter)
         {

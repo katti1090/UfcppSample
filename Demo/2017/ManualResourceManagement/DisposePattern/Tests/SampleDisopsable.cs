@@ -18,7 +18,7 @@ namespace DisposePattern.Tests
     /// </remarks>
     class SampleDisopsable : IDisposable
     {
-        private Counter _counter;
+        private Counter? _counter;
 
         public SampleDisopsable(Counter counter)
         {
