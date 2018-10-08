@@ -7,7 +7,7 @@ namespace TupleMutableStruct.Usage
     class BindableBase : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        protected void SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+        protected void SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null!)
         {
             if (!EqualityComparer<T>.Default.Equals(storage, value))
             {

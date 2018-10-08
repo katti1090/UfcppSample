@@ -18,7 +18,7 @@ namespace TupleMutableStruct.MemoryLayout
         }
 
         const int N = 2000;
-        (byte a, byte b, byte c, byte d, byte e, byte f, byte g, byte h)[] data;
+        (byte a, byte b, byte c, byte d, byte e, byte f, byte g, byte h)[] data = default!;
 
         [Benchmark]
         public SafeAdd.Vector XVector()
