@@ -9,7 +9,7 @@ namespace BitOperations
     // Type parameter T should be blittabl (https://github.com/dotnet/csharplang/issues/187)
     public unsafe struct Bits<T, TOperator> : IBits
         where T : struct
-        where TOperator : SBitOperator<T>
+        where TOperator : struct, SBitOperator<T>
     {
         // This should use ByReference<T> (https://github.com/dotnet/coreclr/blob/master/src/mscorlib/src/System/ByReference.cs) if possible
         void* _ptr;

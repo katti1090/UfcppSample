@@ -35,7 +35,7 @@ namespace BufferPerformance.Buffers
 
         public void Dispose()
         {
-            _buffer = null;
+            _buffer = null!;
         }
 
         public ArraySpan WrittenSpan => new ArraySpan(_buffer, 0, _writeLength);

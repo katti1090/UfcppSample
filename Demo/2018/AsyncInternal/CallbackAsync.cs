@@ -21,7 +21,7 @@ namespace AsyncInternal
                     var contents = new List<string>();
 
                     var e = selectedIndexes.GetEnumerator();
-                    Action<string> getContentCallback = null;
+                    Action<string>? getContentCallback = null;
 
                     void next()
                     {

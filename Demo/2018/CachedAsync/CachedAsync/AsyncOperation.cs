@@ -16,9 +16,9 @@ namespace CachedAsync
     internal class AsyncOperation
     {
         /// <summary>いわゆる「番兵」。1インスタンスを使いまわす想定なので、「使われてない」を表す状態が必要。continuation にこの Action インスタンスを入れることで表現。</summary>
-        internal static readonly Action<object> s_availableSentinel = new Action<object>(s => Debug.Fail($"{nameof(AsyncOperation)}.{nameof(s_availableSentinel)} invoked with {s}."));
+        internal static readonly Action<object?> s_availableSentinel = new Action<object>(s => Debug.Fail($"{nameof(AsyncOperation)}.{nameof(s_availableSentinel)} invoked with {s}."));
         /// <summary>こっちは「完了済み」を表す番兵。</summary>
-        internal static readonly Action<object> s_completedSentinel = new Action<object>(s => Debug.Fail($"{nameof(AsyncOperation)}.{nameof(s_completedSentinel)} invoked with {s}"));
+        internal static readonly Action<object?> s_completedSentinel = new Action<object>(s => Debug.Fail($"{nameof(AsyncOperation)}.{nameof(s_completedSentinel)} invoked with {s}"));
 
         internal static void ThrowIncompleteOperationException() =>
             throw new InvalidOperationException("the operation's result was accessed before the operation completed.");
@@ -45,10 +45,10 @@ namespace CachedAsync
     /// <typeparam name="TResult"></typeparam>
     public class AsyncOperation<TResult> : IValueTaskSource<TResult>
     {
-        private TResult _result;
-        private ExceptionDispatchInfo _error;
-        private Action<object> _continuation = AsyncOperation.s_availableSentinel;
-        private object _continuationState;
+        private TResult _result = default!;
+        private ExceptionDispatchInfo? _error;
+        private Action<object?>? _continuation = AsyncOperation.s_availableSentinel;
+        private object? _continuationState;
 
         /// <summary>現在の非同期操作に紐づいてる値。</summary>
         /// <remarks>
@@ -95,7 +95,7 @@ namespace CachedAsync
                 AsyncOperation.ThrowIncompleteOperationException();
             }
 
-            ExceptionDispatchInfo error = _error;
+            ExceptionDispatchInfo? error = _error;
             TResult result = _result;
             _currentId++;
 
@@ -109,10 +109,10 @@ namespace CachedAsync
         /// <returns>呼び出し元が所有権を取れたら true。この場合、ステートを取得する。取れなかったら false。</returns>
         public bool TryOwnAndReset()
         {
-            if (ReferenceEquals(Interlocked.CompareExchange(ref _continuation, null, AsyncOperation.s_availableSentinel), AsyncOperation.s_availableSentinel))
+            if (ReferenceEquals(Interlocked.CompareExchange(ref _continuation, null!, AsyncOperation.s_availableSentinel), AsyncOperation.s_availableSentinel))
             {
                 _continuationState = null;
-                _result = default;
+                _result = default!;
                 _error = null;
                 return true;
             }
@@ -127,7 +127,7 @@ namespace CachedAsync
         /// この実装は単に同期で continuation(state) 呼び出し。
         /// オーバーヘッドは掛からないけども、スタックが深くなるので注意。
         /// </remarks>
-        void IValueTaskSource<TResult>.OnCompleted(Action<object> continuation, object state, short token, ValueTaskSourceOnCompletedFlags flags)
+        void IValueTaskSource<TResult>.OnCompleted(Action<object?> continuation, object state, short token, ValueTaskSourceOnCompletedFlags flags)
         {
             if (_currentId != token)
             {
@@ -149,7 +149,7 @@ namespace CachedAsync
             //
             // ただ、ここは awaiter の OnCompleted の中から呼ばれているはずで、スタックが詰まれるのを避けたい。
             // なので、(元々の実装では)continuation は非同期に読ぶ。
-            Action<object> prevContinuation = Interlocked.CompareExchange(ref _continuation, continuation, null);
+            Action<object>? prevContinuation = Interlocked.CompareExchange(ref _continuation, continuation, null);
             if (prevContinuation != null)
             {
                 // ここに入った時点で完了済みのはずだけど、何か誤用があった場合には想定外の状態になってることがあるので確認。
@@ -201,7 +201,7 @@ namespace CachedAsync
                 Debug.Assert(_continuation != AsyncOperation.s_completedSentinel, $"The continuation was the completion sentinel.");
                 Debug.Assert(_continuation != AsyncOperation.s_availableSentinel, $"The continuation was the available sentinel.");
 
-                Action<object> c = _continuation;
+                Action<object?> c = _continuation!;
                 _continuation = AsyncOperation.s_completedSentinel;
                 c(_continuationState);
             }
