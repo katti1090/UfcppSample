@@ -21,10 +21,10 @@ namespace WpfApp2
         }
 
         Dictionary<Type, Pair> _templates = new Dictionary<Type, Pair>();
-        Pair _intTemplate;
-        Pair _stringTemplate;
+        Pair? _intTemplate;
+        Pair? _stringTemplate;
 
-        Pair GetPair(object item)
+        Pair? GetPair(object item)
         {
             switch (item)
             {
@@ -64,7 +64,7 @@ namespace WpfApp2
         private static Pair Load(Uri uri)
         {
             var dic = (ResourceDictionary)Application.LoadComponent(uri);
-            var pair = new Pair(dic["Summary"] as DataTemplate, dic["Detail"] as DataTemplate);
+            var pair = new Pair((DataTemplate)dic["Summary"], (DataTemplate)dic["Detail"]);
             return pair;
         }
 
@@ -72,7 +72,7 @@ namespace WpfApp2
         {
             if (item == null) return base.SelectTemplate(item, container);
 
-            var pair = GetPair(item);
+            var pair = GetPair(item) ?? throw new NullReferenceException();
 
             switch (container.GetValue(ModeProperty))
             {
