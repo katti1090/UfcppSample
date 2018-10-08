@@ -10,8 +10,8 @@
     {
         T[] _array;
 
-        public T[] Array => _array;
-        public T Value => _array.Length >= 1 ? _array[0] : default(T);
+        public T[]? Array => _array;
+        public T Value => _array.Length >= 1 ? _array[0] : default!;
 
         public Union4(T value)
         {

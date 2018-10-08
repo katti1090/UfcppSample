@@ -8,21 +8,21 @@
     /// <typeparam name="T"></typeparam>
     abstract class Union3<T> : IUnion<T>
     {
-        public abstract T[] Array { get; }
+        public abstract T[]? Array { get; }
         public abstract T Value { get; }
         private Union3() { }
 
         public class UnionValue : Union3<T>
         {
-            public override T[] Array => null;
+            public override T[]? Array => null;
             public override T Value { get; }
             public UnionValue(T value) => Value = value;
         }
 
         public class UnionArray : Union3<T>
         {
-            public override T[] Array { get; }
-            public override T Value => default(T);
+            public override T[]? Array { get; }
+            public override T Value => default!;
             public UnionArray(T[] array) => Array = array;
         }
 

@@ -8,9 +8,9 @@
     struct Union1<T> : IUnion<T>
     {
         T _value;
-        T[] _array;
+        T[]? _array;
 
-        public T[] Array => _array;
+        public T[]? Array => _array;
         public T Value => _value;
 
         public Union1(T value)
@@ -21,7 +21,7 @@
 
         public Union1(T[] array)
         {
-            _value = default(T);
+            _value = default!;
             _array = array;
         }
     }

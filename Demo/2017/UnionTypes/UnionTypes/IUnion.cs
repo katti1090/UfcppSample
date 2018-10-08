@@ -6,7 +6,7 @@
     /// </summary>
     interface IUnion<T>
     {
-        T[] Array { get; }
+        T[]? Array { get; }
         T Value { get; }
     }
 }

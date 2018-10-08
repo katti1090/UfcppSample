@@ -8,9 +8,9 @@
     /// </summary>
     struct Union2<T> : IUnion<T>
     {
-        object _value;
+        object? _value;
 
-        public T[] Array => _value as T[];
+        public T[]? Array => _value as T[];
         public T Value => (T)_value;
 
         public Union2(T value) => _value = value;

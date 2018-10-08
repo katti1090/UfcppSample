@@ -11,7 +11,7 @@
         bool _isArray;
         T[] _array;
 
-        public T[] Array => _isArray ? _array : null;
+        public T[]? Array => _isArray ? _array : null;
         public T Value => _array[0];
 
         public Union5(T value)
