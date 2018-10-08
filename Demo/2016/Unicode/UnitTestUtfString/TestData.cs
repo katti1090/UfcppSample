@@ -34,7 +34,7 @@ namespace UnitTestUtfString
         public ushort[] Utf16S { get; }
         public byte[] Utf32B { get; }
         public uint[] Utf32I { get; }
-        public byte[] Latin1 { get; }
+        public byte[]? Latin1 { get; }
 
         public TestData(string s)
         {
