@@ -19,12 +19,11 @@ namespace ModalDialogSample
             where TWindow : Window, IResultDialog<TResult>
         {
             var tcs = new TaskCompletionSource<TResult>();
-            EventHandler closed = null;
-            closed = (sender, e) =>
+            void closed(object sender, EventArgs e)
             {
                 window.Closed -= closed;
                 tcs.TrySetResult(window.Result);
-            };
+            }
 
             window.Closed += closed;
             window.ShowDialog();
